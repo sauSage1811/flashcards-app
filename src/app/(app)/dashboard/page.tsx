@@ -53,7 +53,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Dashboard</h1>
-          <p className="text-neutral-500 mt-2">Welcome back! Here's your learning overview.</p>
+          <p className="text-neutral-500 mt-2">Welcome back! Here&#39;s your learning overview.</p>
         </div>
         <Link
           href="/decks/new"
@@ -149,6 +149,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-

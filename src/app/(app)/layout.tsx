@@ -3,14 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/auth';
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<any>(null);
+  interface AuthUser {
+    id: string;
+    name: string | null;
+    email: string;
+  }
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -20,7 +24,7 @@ export default function AppLayout({
       try {
         const response = await fetch('/api/auth/me');
         if (response.ok) {
-          const userData = await response.json();
+        const userData: AuthUser = await response.json();
           setUser(userData);
         } else {
           router.push('/auth/login');

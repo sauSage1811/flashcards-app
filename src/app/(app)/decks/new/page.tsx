@@ -36,7 +36,7 @@ export default function NewDeckPage() {
       } else {
         toast.error(result.message || 'Failed to create deck');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

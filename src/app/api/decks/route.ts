@@ -1,9 +1,11 @@
+// app/api/decks/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { deckSchema } from '@/lib/validators';
+import { ZodError } from 'zod';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -54,21 +56,23 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(deck, { status: 201 });
-  } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { message: 'Invalid input data', errors: (error as any).errors },
-        { status: 400 }
-      );
-    }
-    
-    console.error('Create deck error:', error);
+ } catch (error) {
+  if (error instanceof ZodError) {
     return NextResponse.json(
-      { message: 'An internal error occurred' },
-      { status: 500 }
+      { message: "Invalid input data", errors: error.issues },
+      { status: 400 }
     );
   }
+
+  console.error("Create deck error:", error);
+  return NextResponse.json(
+    { message: "An internal error occurred" },
+    { status: 500 }
+  );
 }
+
+}
+
 
 
 

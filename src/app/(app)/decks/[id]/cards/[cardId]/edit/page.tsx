@@ -5,7 +5,18 @@ import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cardSchema, type CardInput } from '@/lib/validators';
+import type { z } from 'zod';
 import { toast } from 'sonner';
+
+interface CurrentCard {
+  id: string;
+  term: string;
+  definition: string;
+  partOfSpeech: string;
+  phonetics?: string | null;
+  exampleSentence?: string | null;
+  tags?: string[];
+}
 
 export default function EditCardPage() {
   const params = useParams();
@@ -13,7 +24,7 @@ export default function EditCardPage() {
   const deckId = params.id as string;
   const cardId = params.cardId as string;
   const [isLoading, setIsLoading] = useState(false);
-  const [card, setCard] = useState<any>(null);
+  const [card, setCard] = useState<CurrentCard | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   
@@ -23,7 +34,7 @@ export default function EditCardPage() {
     formState: { errors },
     setValue,
     reset,
-  } = useForm<CardInput>({
+  } = useForm<z.input<typeof cardSchema>>({
     resolver: zodResolver(cardSchema),
     defaultValues: {
       tags: [],
@@ -36,15 +47,15 @@ export default function EditCardPage() {
       try {
         const response = await fetch(`/api/decks/${deckId}/cards`);
         if (response.ok) {
-          const cards = await response.json();
-          const currentCard = cards.find((c: any) => c.id === cardId);
+          const cards = (await response.json()) as CurrentCard[];
+          const currentCard = cards.find((c) => c.id === cardId);
           if (currentCard) {
             setCard(currentCard);
             setTags(currentCard.tags || []);
             reset({
               term: currentCard.term,
               definition: currentCard.definition,
-              partOfSpeech: currentCard.partOfSpeech,
+              partOfSpeech: currentCard.partOfSpeech as CardInput['partOfSpeech'],
               phonetics: currentCard.phonetics || '',
               exampleSentence: currentCard.exampleSentence || '',
             });
@@ -56,7 +67,7 @@ export default function EditCardPage() {
           toast.error('Failed to load card');
           router.push(`/decks/${deckId}`);
         }
-      } catch (error) {
+      } catch {
         toast.error('Error loading card');
         router.push(`/decks/${deckId}`);
       }
@@ -82,7 +93,7 @@ export default function EditCardPage() {
     setValue('tags', updatedTags);
   };
 
-  const onSubmit = async (data: CardInput) => {
+  const onSubmit = async (data: z.input<typeof cardSchema>) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/cards/${cardId}`, {
@@ -99,7 +110,7 @@ export default function EditCardPage() {
       } else {
         toast.error(result.message || 'Failed to update card');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

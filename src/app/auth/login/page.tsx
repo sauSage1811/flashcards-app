@@ -37,7 +37,7 @@ export default function LoginPage() {
       } else {
         toast.error(result.message || 'Login failed');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
       <div className="text-center mt-6">
         <p className="text-neutral-500">
-          Don't have an account?{' '}
+          Don&#39;t have an account?{' '}
           <Link href="/auth/register" className="text-primary hover:underline">
             Sign up
           </Link>

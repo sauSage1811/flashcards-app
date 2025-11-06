@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { cardSchema, type CardInput } from '@/lib/validators';
+import { cardSchema } from '@/lib/validators';
+import type { z } from 'zod';
 import { toast } from 'sonner';
 
 export default function NewCardPage() {
@@ -20,7 +21,7 @@ export default function NewCardPage() {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm<CardInput>({
+  } = useForm<z.input<typeof cardSchema>>({
     resolver: zodResolver(cardSchema),
     defaultValues: {
       tags: [],
@@ -43,7 +44,7 @@ export default function NewCardPage() {
     setValue('tags', updatedTags);
   };
 
-  const onSubmit = async (data: CardInput) => {
+  const onSubmit = async (data: z.input<typeof cardSchema>) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/decks/${deckId}/cards`, {
@@ -60,7 +61,7 @@ export default function NewCardPage() {
       } else {
         toast.error(result.message || 'Failed to create card');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

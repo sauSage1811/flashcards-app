@@ -181,7 +181,7 @@ export default function DeckDetailPage() {
               
               {card.exampleSentence && (
                 <p className="text-neutral-500 text-sm italic mb-3">
-                  "{card.exampleSentence}"
+                  &quot;{card.exampleSentence}&quot;
                 </p>
               )}
               

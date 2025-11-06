@@ -37,7 +37,7 @@ export default function RegisterPage() {
       } else {
         toast.error(result.message || 'Registration failed');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

@@ -3,13 +3,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { StudyView } from '@/components/flashcards/StudyView';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const fetchUserDecks = async () => {
   const response = await fetch('/api/decks');
   if (!response.ok) throw new Error('Failed to fetch decks');
   return response.json();
 };
+
+interface DeckSummary {
+  id: string;
+  title: string;
+  description: string | null;
+  _count: { cards: number };
+}
 
 export default function StudyPage() {
   const [selectedDeckId, setSelectedDeckId] = useState<string | null>(null);
@@ -84,7 +91,7 @@ export default function StudyPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {decks.map((deck: any) => (
+        {decks.map((deck: DeckSummary) => (
           <div
             key={deck.id}
             className="card p-6 hover:shadow-md transition-shadow cursor-pointer"

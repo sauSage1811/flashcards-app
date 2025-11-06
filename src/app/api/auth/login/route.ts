@@ -1,7 +1,9 @@
+// app/api/auth/login/route.ts (hoặc đúng đường dẫn file bạn đang dùng)
 import { NextRequest, NextResponse } from 'next/server';
 import { loginSchema } from '@/lib/validators';
 import { prisma } from '@/lib/db';
 import { verifyPassword, createToken, setAuthCookie } from '@/lib/auth';
+import { ZodError } from 'zod';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,23 +22,23 @@ export async function POST(req: NextRequest) {
     const token = await createToken({ userId: user.id, email: user.email });
     await setAuthCookie(token);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         createdAt: user.createdAt,
       },
-      message: 'Login successful' 
+      message: 'Login successful',
     });
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { message: 'Invalid input data', errors: (error as any).errors },
+        { message: 'Invalid input data', errors: error.issues },
         { status: 400 }
       );
     }
-    
+
     console.error('Login error:', error);
     return NextResponse.json(
       { message: 'An internal error occurred' },
@@ -44,6 +46,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-
-

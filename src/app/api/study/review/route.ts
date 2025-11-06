@@ -1,8 +1,10 @@
+// app/api/study/review/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { reviewSchema } from '@/lib/validators';
 import { calculateSRS, getNextReviewDate } from '@/lib/srs';
+import { ZodError } from 'zod';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,9 +20,7 @@ export async function POST(req: NextRequest) {
     const card = await prisma.card.findFirst({
       where: { 
         id: cardId,
-        deck: {
-          userId: user.id,
-        },
+        deck: { userId: user.id },
       },
     });
 
@@ -62,9 +62,9 @@ export async function POST(req: NextRequest) {
       card: updatedCard,
     });
   } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
+    if (error instanceof ZodError) {
       return NextResponse.json(
-        { message: 'Invalid input data', errors: (error as any).errors },
+        { message: 'Invalid input data', errors: error.issues },
         { status: 400 }
       );
     }

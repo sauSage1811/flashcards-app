@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { registerSchema } from '@/lib/validators';
 import { prisma } from '@/lib/db';
 import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
+import { ZodError } from 'zod';
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,15 +42,15 @@ export async function POST(req: NextRequest) {
     await setAuthCookie(token);
 
     return NextResponse.json({ user, message: 'Registration successful' });
-  } catch (error) {
-    if (error instanceof Error && error.name === 'ZodError') {
+  } catch (err) {
+    if (err instanceof ZodError) {
       return NextResponse.json(
-        { message: 'Invalid input data', errors: (error as any).errors },
+        { message: 'Invalid input data', errors: err.issues },
         { status: 400 }
       );
     }
     
-    console.error('Registration error:', error);
+    console.error('Registration error:', err);
     return NextResponse.json(
       { message: 'An internal error occurred' },
       { status: 500 }

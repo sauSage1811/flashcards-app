@@ -33,7 +33,8 @@ export async function verifyToken(token: string): Promise<{ userId: string; emai
 }
 
 export async function setAuthCookie(token: string): Promise<void> {
-  cookies().set('token', token, {
+  const cookieStore = await cookies();
+  cookieStore.set('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
@@ -43,12 +44,14 @@ export async function setAuthCookie(token: string): Promise<void> {
 }
 
 export async function clearAuthCookie(): Promise<void> {
-  cookies().delete('token');
+  const cookieStore = await cookies();
+  cookieStore.delete('token');
 }
 
 export async function getCurrentUser() {
   try {
-    const token = cookies().get('token')?.value;
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
     if (!token) return null;
 
     const payload = await verifyToken(token);

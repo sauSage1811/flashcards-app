@@ -12,7 +12,12 @@ export default function EditDeckPage() {
   const router = useRouter();
   const deckId = params.id as string;
   const [isLoading, setIsLoading] = useState(false);
-  const [deck, setDeck] = useState<any>(null);
+  interface DeckData {
+    id: string;
+    title: string;
+    description: string | null;
+  }
+  const [deck, setDeck] = useState<DeckData | null>(null);
   
   const {
     register,
@@ -38,7 +43,7 @@ export default function EditDeckPage() {
           toast.error('Failed to load deck');
           router.push('/decks');
         }
-      } catch (error) {
+      } catch {
         toast.error('Error loading deck');
         router.push('/decks');
       }
@@ -66,7 +71,7 @@ export default function EditDeckPage() {
       } else {
         toast.error(result.message || 'Failed to update deck');
       }
-    } catch (error) {
+    } catch {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
