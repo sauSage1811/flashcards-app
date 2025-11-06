@@ -67,14 +67,8 @@ A modern, full-stack flashcard application built with Next.js, featuring spaced 
    npm run dev
    ```
 
-5. **Open your browser:**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Default Test Account
-
-After seeding, you can log in with:
-- **Email**: test@example.com
-- **Password**: password123
+5. public website : 
+ https://flashcards-app-1uyf.vercel.app/
 
 ## Available Scripts
 
