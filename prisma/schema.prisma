@@ -1,0 +1,83 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  decks         Deck[]
+  reviewLogs    ReviewLog[]
+}
+
+model Deck {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards       Card[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum PartOfSpeech {
+  NOUN
+  VERB
+  ADJECTIVE
+  ADVERB
+  PRONOUN
+  PREPOSITION
+  CONJUNCTION
+  INTERJECTION
+  OTHER
+}
+
+model Card {
+  id              String       @id @default(cuid())
+  term            String
+  definition      String
+  partOfSpeech    PartOfSpeech @default(OTHER)
+  phonetics       String?
+  exampleSentence String?
+  tags            String[]
+  deckId          String
+  deck            Deck         @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  reviewLogs      ReviewLog[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Spaced Repetition Fields
+  easiness        Float     @default(2.5)
+  interval        Int       @default(1)
+  repetitions     Int       @default(0)
+  nextReview      DateTime  @default(now())
+
+  @@index([deckId])
+}
+
+model ReviewLog {
+  id         String   @id @default(cuid())
+  grade      Int // 0-5 scale
+  reviewedAt DateTime @default(now())
+  cardId     String
+  card       Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@index([userId])
+}
